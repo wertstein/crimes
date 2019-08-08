@@ -11,6 +11,7 @@ export class CrimesService {
   private readonly crimes: Crime[] = [...CRIMES];
 
   create(crime: Crime) {
+    crime.id = '3';
     this.crimes.push(crime);
   }
 
