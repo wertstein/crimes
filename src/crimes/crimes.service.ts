@@ -21,7 +21,6 @@ export class CrimesService {
   }
 
   async findOne(id: string): Promise<Crime> {
-    // TODO: add search
-    return await this.crimeModel.find().exec();
+    return await this.crimeModel.findById(id);
   }
 }
