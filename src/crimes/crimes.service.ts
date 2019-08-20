@@ -1,25 +1,27 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { Crime } from './interfaces/crime.interface';
-
-const CRIMES: Crime[] = [
-  { id: '1', title: 'MH17' },
-  { id: '2', title: 'Salisbury' },
-];
+import { CreateCrimeDto } from './dto/create-crime.dto';
 
 @Injectable()
 export class CrimesService {
-  private readonly crimes: Crime[] = [...CRIMES];
+  constructor(
+    @InjectModel('Crime') private readonly crimeModel: Model<Crime>,
+  ) {}
 
-  create(crime: Crime) {
-    crime.id = '3';
-    this.crimes.push(crime);
+  async create(createCatDto: CreateCrimeDto): Promise<Crime> {
+    const createdCat = new this.crimeModel(createCatDto);
+
+    return await createdCat.save();
   }
 
-  findAll(): Crime[] {
-    return this.crimes;
+  async findAll(): Promise<Crime[]> {
+    return await this.crimeModel.find().exec();
   }
 
-  findOne(id: string): Crime {
-    return this.crimes[0];
+  async findOne(id: string): Promise<Crime> {
+    // TODO: add search
+    return await this.crimeModel.find().exec();
   }
 }

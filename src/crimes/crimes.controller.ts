@@ -9,17 +9,17 @@ export class CrimesController {
   constructor(private readonly crimesService: CrimesService) {}
 
   @Post()
-  create(@Body() createCatDto: CreateCrimeDto) {
-    this.crimesService.create(createCatDto);
+  async create(@Body() createCatDto: CreateCrimeDto) {
+    return await this.crimesService.create(createCatDto);
   }
 
   @Get()
-  findAll(@Req() request: Request): Observable<any[]> {
-    return of(this.crimesService.findAll());
+  async findAll(@Req() request: Request) {
+    return await this.crimesService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id): Observable<any> {
-    return of(this.crimesService.findOne(id));
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id): Observable<any> {
+  //   return of(this.crimesService.findOne(id));
+  // }
 }
