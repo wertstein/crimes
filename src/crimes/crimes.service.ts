@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  UseInterceptors,
+  ClassSerializerInterceptor,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Crime } from './interfaces/crime.interface';
@@ -10,8 +14,8 @@ export class CrimesService {
     @InjectModel('Crime') private readonly crimeModel: Model<Crime>,
   ) {}
 
-  async create(createCatDto: CreateCrimeDto): Promise<Crime> {
-    const createdCat = new this.crimeModel(createCatDto);
+  async create(createCrimeDto: CreateCrimeDto): Promise<Crime> {
+    const createdCat = new this.crimeModel(createCrimeDto);
 
     return await createdCat.save();
   }
