@@ -1,25 +1,41 @@
-import { Controller, Get, Req, Post, Param, Body } from '@nestjs/common';
-import { Request } from 'express';
-import { Observable, of } from 'rxjs';
-import { CreateCrimeDto } from './dto/create-crime.dto';
+import {
+  Body,
+  ClassSerializerInterceptor,
+  Controller,
+  Get,
+  Param,
+  Post,
+  SerializeOptions,
+  UseInterceptors,
+} from '@nestjs/common';
 import { CrimesService } from './crimes.service';
+import { CreateCrimeDto } from './dto/create-crime.dto';
+import { CrimeEntity } from './entities/crime';
 
 @Controller('crimes')
+@UseInterceptors(ClassSerializerInterceptor)
+@SerializeOptions({
+  excludePrefixes: ['_'],
+})
 export class CrimesController {
   constructor(private readonly crimesService: CrimesService) {}
 
   @Post()
-  create(@Body() createCatDto: CreateCrimeDto) {
-    this.crimesService.create(createCatDto);
+  async create(@Body() createCatDto: CreateCrimeDto) {
+    return await this.crimesService.create(createCatDto);
   }
 
   @Get()
-  findAll(@Req() request: Request): Observable<any[]> {
-    return of(this.crimesService.findAll());
+  async findAll() {
+    return await this.crimesService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id): Observable<any> {
-    return of(this.crimesService.findOne(id));
+  async findOne(@Param('id') id) {
+    let crime = await this.crimesService.findOne(id);
+
+    crime = JSON.parse(JSON.stringify(crime)); //TODO: clarify
+
+    return new CrimeEntity(crime);
   }
 }
