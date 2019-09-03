@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import * as helmet from 'helmet';
 import { AppModule } from './app.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { ConfigService } from './config/config.service';
 
 declare const module: any;
 
@@ -22,7 +23,9 @@ async function bootstrap() {
 
   app.use(helmet());
 
-  await app.listen(3000);
+  const configService = new ConfigService(`${process.env.NODE_ENV || ''}.env`);
+
+  await app.listen(configService.get('PORT'));
 
   if (module.hot) {
     module.hot.accept();

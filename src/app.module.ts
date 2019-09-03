@@ -1,19 +1,13 @@
-import {
-  Module,
-  MiddlewareConsumer,
-  RequestMethod,
-  CacheModule,
-  CacheInterceptor,
-} from '@nestjs/common';
+import { CacheInterceptor, CacheModule, MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { CrimesModule } from './crimes/crimes.module';
-import { LoggerMiddleware } from './common/middleware/logger.middleware';
 import { AuthModule } from './auth/auth.module';
+import { LoggerMiddleware } from './common/middleware/logger.middleware';
+import { ConfigModule } from './config/config.module';
+import { ConfigService } from './config/config.service';
+import { CrimesModule } from './crimes/crimes.module';
 import { UsersModule } from './users/users.module';
-import { config } from './config/config';
-import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -24,11 +18,17 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     }),
     AuthModule,
     UsersModule,
-    MongooseModule.forRoot(config.mongo),
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (configService: ConfigService) => ({
+        uri: configService.get('MONGO'),
+      }),
+      inject: [ConfigService],
+    }),
+    ConfigModule,
   ],
   controllers: [AppController],
   providers: [
-    AppService,
     {
       provide: APP_INTERCEPTOR,
       useClass: CacheInterceptor,
