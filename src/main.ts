@@ -1,9 +1,9 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import * as helmet from 'helmet';
+import { AppModule } from './app.module';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-
-declare const module: any;
+import { ConfigService } from './config/config.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -19,11 +19,10 @@ async function bootstrap() {
 
   app.useGlobalInterceptors(new TransformInterceptor());
 
-  await app.listen(3000);
+  app.use(helmet());
 
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
+  const configService = new ConfigService(`${process.env.NODE_ENV || ''}.env`);
+
+  await app.listen(configService.get('PORT'));
 }
 bootstrap();
